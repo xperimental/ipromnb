@@ -1,0 +1,13 @@
+# Gopkg.toml example
+[prune]
+  go-tests = true
+  unused-packages = true
+  non-go = true
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/yunabe/lgo"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/prometheus/common"
