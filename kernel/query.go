@@ -11,6 +11,7 @@ import (
 	"github.com/gonum/plot/palette/brewer"
 	"github.com/prometheus/client_golang/api/prometheus"
 	"github.com/prometheus/common/model"
+	"github.com/xperimental/ipromnb/scaffold"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -32,6 +33,41 @@ type metricValue struct {
 	Value  model.SamplePair `json:"value"`
 }
 
+func (k *Kernel) handleQuery(ctx context.Context, count int, code string,
+	stream func(name, text string), displayData scaffold.DisplayFunc) (string, error) {
+
+	if match := graphRegex.FindStringSubmatch(code); match != nil {
+		zero := match[1] == "0"
+		query := match[2]
+
+		result, err := k.handleRangeQuery(ctx, query, k.Options.TimeStart, k.Options.TimeEnd, zero)
+		if err != nil {
+			return "", err
+		}
+
+		displayData(&scaffold.DisplayData{
+			Data: map[string]interface{}{
+				"image/png": result,
+			},
+		}, false)
+
+		return query, nil
+	}
+
+	result, err := k.handleInstantQuery(ctx, code, k.Options.TimeEnd)
+	if err != nil {
+		return "", err
+	}
+
+	displayData(&scaffold.DisplayData{
+		Data: map[string]interface{}{
+			"text/html": result,
+		},
+	}, false)
+
+	return code, nil
+}
+
 func (k *Kernel) getAPI() (prometheus.QueryAPI, error) {
 	client, err := prometheus.New(prometheus.Config{
 		Address: k.Options.Server,
@@ -43,13 +79,13 @@ func (k *Kernel) getAPI() (prometheus.QueryAPI, error) {
 	return prometheus.NewQueryAPI(client), nil
 }
 
-func (k *Kernel) handleInstantQuery(query string, instant time.Time) (string, error) {
+func (k *Kernel) handleInstantQuery(ctx context.Context, query string, instant time.Time) (string, error) {
 	api, err := k.getAPI()
 	if err != nil {
 		return "", err
 	}
 
-	value, err := api.Query(context.Background(), query, instant)
+	value, err := api.Query(ctx, query, instant)
 	if err != nil {
 		return "", fmt.Errorf("query failed: %s", err)
 	}
@@ -77,7 +113,7 @@ const (
 // Only show important part of metric name
 var labelText = regexp.MustCompile("\\{(.*)\\}")
 
-func (k *Kernel) handleRangeQuery(query string, start, end time.Time, zero bool) ([]byte, error) {
+func (k *Kernel) handleRangeQuery(ctx context.Context, query string, start, end time.Time, zero bool) ([]byte, error) {
 	duration := k.Options.TimeEnd.Sub(k.Options.TimeStart)
 	rng := prometheus.Range{
 		Start: k.Options.TimeStart,
@@ -90,7 +126,7 @@ func (k *Kernel) handleRangeQuery(query string, start, end time.Time, zero bool)
 		return nil, err
 	}
 
-	value, err := api.QueryRange(context.Background(), query, rng)
+	value, err := api.QueryRange(ctx, query, rng)
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %s", err)
 	}

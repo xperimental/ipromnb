@@ -1,6 +1,10 @@
 package scaffold
 
-import "context"
+import (
+	"context"
+)
+
+type DisplayFunc func(data *DisplayData, update bool)
 
 // RequestHandlers is the interface to define handlers to handle Jupyter messages.
 // Except for HandleGoFmt, all mesages are defined in
@@ -13,7 +17,7 @@ type RequestHandlers interface {
 	HandleExecuteRequest(ctx context.Context,
 		req *ExecuteRequest,
 		writeStream func(name, text string),
-		writeDisplayData func(data *DisplayData, update bool)) *ExecuteResult
+		writeDisplayData DisplayFunc) *ExecuteResult
 	HandleComplete(req *CompleteRequest) *CompleteReply
 	HandleInspect(req *InspectRequest) *InspectReply
 	// http://jupyter-client.readthedocs.io/en/latest/messaging.html#code-completeness

@@ -15,6 +15,7 @@ type Kernel struct {
 	Options   Options
 	client    *http.Client
 	execution int
+	queries   []string
 }
 
 // New creates a new Prometheus kernel.
@@ -28,6 +29,8 @@ func New(server string) *Kernel {
 		client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
+		execution: 0,
+		queries:   []string{},
 	}
 }
 
@@ -46,8 +49,7 @@ func (k *Kernel) HandleKernelInfo() scaffold.KernelInfo {
 var graphRegex = regexp.MustCompile(`^graph(0?)\((.+)\)$`)
 
 func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.ExecuteRequest,
-	stream func(name, text string),
-	displayData func(data *scaffold.DisplayData, update bool)) *scaffold.ExecuteResult {
+	stream func(name, text string), displayData scaffold.DisplayFunc) *scaffold.ExecuteResult {
 
 	k.execution++
 
@@ -66,43 +68,15 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 		}
 	}
 
-	if match := graphRegex.FindStringSubmatch(req.Code); match != nil {
-		zero := match[1] == "0"
-		query := match[2]
+	query, err := k.handleQuery(ctx, k.execution, req.Code, stream, displayData)
+	k.queries = append(k.queries, query)
 
-		result, err := k.handleRangeQuery(query, k.Options.TimeStart, k.Options.TimeEnd, zero)
-		if err != nil {
-			stream("stderr", fmt.Sprintf("Error executing query: %s", err))
-			return &scaffold.ExecuteResult{
-				Status: "error",
-			}
-		}
-
-		displayData(&scaffold.DisplayData{
-			Data: map[string]interface{}{
-				"image/png": result,
-			},
-		}, false)
-
-		return &scaffold.ExecuteResult{
-			Status:         "ok",
-			ExecutionCount: k.execution,
-		}
-	}
-
-	result, err := k.handleInstantQuery(req.Code, k.Options.TimeEnd)
 	if err != nil {
 		stream("stderr", fmt.Sprintf("Error executing query: %s", err))
 		return &scaffold.ExecuteResult{
 			Status: "error",
 		}
 	}
-
-	displayData(&scaffold.DisplayData{
-		Data: map[string]interface{}{
-			"text/html": result,
-		},
-	}, false)
 
 	return &scaffold.ExecuteResult{
 		Status:         "ok",
