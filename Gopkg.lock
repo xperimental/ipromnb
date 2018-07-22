@@ -3,9 +3,56 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/ajstarks/svgo"
+  packages = ["."]
+  revision = "644b8db467afccf19a0692a3e31a1868e4287ab8"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/freetype"
+  packages = [
+    ".",
+    "raster",
+    "truetype"
+  ]
+  revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
+
+[[projects]]
+  branch = "errors"
+  name = "github.com/gonum/plot"
+  packages = [
+    "palette",
+    "palette/brewer"
+  ]
+  revision = "e844702637a6a728ff6da6041abd81794d69b917"
+
+[[projects]]
+  name = "github.com/jung-kurt/gofpdf"
+  packages = ["."]
+  revision = "14c1db30737a138f8d9797cffea58783892b2fae"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/llgcode/draw2d"
+  packages = [
+    ".",
+    "draw2dbase",
+    "draw2dimg"
+  ]
+  revision = "274031cf2abe8acd15c4a911e1f7f1295fc4830c"
+
+[[projects]]
+  branch = "master"
   name = "github.com/pebbe/zmq4"
   packages = ["."]
   revision = "5b443b6471cea4b4f9f85025530c04c93233f76a"
+
+[[projects]]
+  name = "github.com/prometheus/client_golang"
+  packages = ["api/prometheus"]
+  revision = "c5b7fccd204277076155f10851dad72b76a49317"
+  version = "v0.8.0"
 
 [[projects]]
   branch = "master"
@@ -27,6 +74,28 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/image"
+  packages = [
+    "draw",
+    "font",
+    "math/f64",
+    "math/fixed",
+    "tiff",
+    "tiff/lzw"
+  ]
+  revision = "c73c2afc3b812cdd6385de5a50616511c4a3d458"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "context",
+    "context/ctxhttp"
+  ]
+  revision = "a680a1efc54dd51c040b3b5ce4939ea3cf2ea0d1"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = [
     "unix",
@@ -34,9 +103,46 @@
   ]
   revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
+[[projects]]
+  branch = "master"
+  name = "gonum.org/v1/gonum"
+  packages = [
+    "blas",
+    "blas/blas64",
+    "blas/gonum",
+    "floats",
+    "internal/asm/c128",
+    "internal/asm/f32",
+    "internal/asm/f64",
+    "internal/math32",
+    "lapack",
+    "lapack/gonum",
+    "lapack/lapack64",
+    "mat"
+  ]
+  revision = "72e79ca98526cae0807f57ef69033b767f715ea7"
+
+[[projects]]
+  branch = "master"
+  name = "gonum.org/v1/plot"
+  packages = [
+    ".",
+    "palette",
+    "plotter",
+    "tools/bezier",
+    "vg",
+    "vg/draw",
+    "vg/fonts",
+    "vg/vgeps",
+    "vg/vgimg",
+    "vg/vgpdf",
+    "vg/vgsvg"
+  ]
+  revision = "39ccdfa2a491a630db72d7bbe2c760f4f3d06ab6"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "90fec527c3cd9d4c1ce5ecad50730520233a5712aa43a6ec13e4ad8057bdab80"
+  inputs-digest = "583efce2acce20fbfe3bd3473d80f108fc30e38a14d59da6cbf67d45079924d6"
   solver-name = "gps-cdcl"
   solver-version = 1
