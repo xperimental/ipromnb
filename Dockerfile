@@ -26,6 +26,6 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /go/bin/prometheus-kernel /usr/local/bin/
-COPY kernel.json /opt/conda/share/jupyter/kernels/prometheus/
+COPY kernel.json logo-32x32.png logo-64x64.png /opt/conda/share/jupyter/kernels/prometheus/
 
 USER $NB_UID
