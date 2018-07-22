@@ -15,7 +15,7 @@ COPY . /go/src/${REPO}
 WORKDIR /go/src/${PACKAGE}
 RUN go install -a -v -tags netgo -ldflags "${LD_FLAGS}" .
 
-FROM jupyter/minimal-notebook
+FROM jupyter/base-notebook
 LABEL maintainer="Robert Jacob <xperimental@solidproject.de>"
 
 USER root
