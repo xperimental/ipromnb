@@ -101,7 +101,20 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 	}
 }
 
+func lastIdentifier(input string, pos int) (string, int, int) {
+	input = input[:pos]
+	index := strings.LastIndexAny(input, ` +-*/{}[]()`)
+
+	if index == -1 {
+		return input, 0, len(input)
+	}
+
+	return input[index+1:], index + 1, len(input)
+}
+
 func (k *Kernel) HandleComplete(req *scaffold.CompleteRequest) *scaffold.CompleteReply {
+	identifier, start, end := lastIdentifier(req.Code, req.CursorPos)
+
 	api, err := k.getAPI()
 	if err != nil {
 		return &scaffold.CompleteReply{
@@ -109,7 +122,7 @@ func (k *Kernel) HandleComplete(req *scaffold.CompleteRequest) *scaffold.Complet
 		}
 	}
 
-	sets, err := api.Series(context.Background(), []string{fmt.Sprintf(`{__name__=~"%s.*"}`, req.Code)}, k.Options.TimeStart, k.Options.TimeEnd)
+	sets, err := api.Series(context.Background(), []string{fmt.Sprintf(`{__name__=~"%s.*"}`, identifier)}, k.Options.TimeStart, k.Options.TimeEnd)
 	if err != nil {
 		log.Printf("Error getting series: %s", err)
 		return &scaffold.CompleteReply{
@@ -134,8 +147,8 @@ func (k *Kernel) HandleComplete(req *scaffold.CompleteRequest) *scaffold.Complet
 	return &scaffold.CompleteReply{
 		Status:      "ok",
 		Matches:     matches,
-		CursorStart: 0,
-		CursorEnd:   req.CursorPos,
+		CursorStart: start,
+		CursorEnd:   end,
 	}
 }
 
