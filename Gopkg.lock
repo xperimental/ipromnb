@@ -3,12 +3,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/golang/glog"
-  packages = ["."]
-  revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
-
-[[projects]]
-  branch = "master"
   name = "github.com/pebbe/zmq4"
   packages = ["."]
   revision = "5b443b6471cea4b4f9f85025530c04c93233f76a"
@@ -19,9 +13,30 @@
   packages = ["model"]
   revision = "7600349dcfe1abd18d72d3a1770870d9800a7801"
 
+[[projects]]
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
+  version = "v1.0.6"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "a2144134853fc9a27a7b1e3eb4f19f1a76df13c9"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows"
+  ]
+  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "344760c32b83026563c69c9f3da5084a1b3422925da9c66e8e3c5b51e4b51ec0"
+  inputs-digest = "90fec527c3cd9d4c1ce5ecad50730520233a5712aa43a6ec13e4ad8057bdab80"
   solver-name = "gps-cdcl"
   solver-version = 1
