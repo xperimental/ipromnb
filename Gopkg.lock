@@ -19,15 +19,9 @@
   packages = ["model"]
   revision = "7600349dcfe1abd18d72d3a1770870d9800a7801"
 
-[[projects]]
-  branch = "master"
-  name = "github.com/yunabe/lgo"
-  packages = ["jupyter/gojupyterscaffold"]
-  revision = "1e26e9aa8bf36ea2da5a7a7b093239066062b07d"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2b29c0f475cf1c57a5cd1dfce54c55794f6bff557ea4fd51572de54c937e1e43"
+  inputs-digest = "344760c32b83026563c69c9f3da5084a1b3422925da9c66e8e3c5b51e4b51ec0"
   solver-name = "gps-cdcl"
   solver-version = 1
