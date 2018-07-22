@@ -20,21 +20,6 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 )
 
-type queryResult struct {
-	Status string    `json:"status"`
-	Data   queryData `json:"data"`
-}
-
-type queryData struct {
-	Type   string        `json:"resultType"`
-	Result []metricValue `json:"result"`
-}
-
-type metricValue struct {
-	Labels model.Metric     `json:"metric"`
-	Value  model.SamplePair `json:"value"`
-}
-
 var (
 	errNoMetrics = errors.New("no matching metrics")
 )
