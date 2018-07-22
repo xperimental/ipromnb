@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/gonum/plot/palette/brewer"
-	"github.com/prometheus/client_golang/api/prometheus"
+	"github.com/prometheus/client_golang/api"
+	promv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/xperimental/ipromnb/scaffold"
 	"gonum.org/v1/plot"
@@ -68,15 +69,15 @@ func (k *Kernel) handleQuery(ctx context.Context, count int, code string,
 	return code, nil
 }
 
-func (k *Kernel) getAPI() (prometheus.QueryAPI, error) {
-	client, err := prometheus.New(prometheus.Config{
+func (k *Kernel) getAPI() (promv1.API, error) {
+	client, err := api.NewClient(api.Config{
 		Address: k.Options.Server,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create client: %s", err)
 	}
 
-	return prometheus.NewQueryAPI(client), nil
+	return promv1.NewAPI(client), nil
 }
 
 func (k *Kernel) handleInstantQuery(ctx context.Context, query string, instant time.Time) (string, error) {
@@ -115,7 +116,7 @@ var labelText = regexp.MustCompile("\\{(.*)\\}")
 
 func (k *Kernel) handleRangeQuery(ctx context.Context, query string, start, end time.Time, zero bool) ([]byte, error) {
 	duration := k.Options.TimeEnd.Sub(k.Options.TimeStart)
-	rng := prometheus.Range{
+	rng := promv1.Range{
 		Start: k.Options.TimeStart,
 		End:   k.Options.TimeEnd,
 		Step:  duration / 320,
