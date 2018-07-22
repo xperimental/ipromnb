@@ -3,11 +3,14 @@ package kernel
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
+	"github.com/prometheus/common/model"
 	"github.com/xperimental/ipromnb/scaffold"
 )
 
@@ -99,10 +102,39 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 }
 
 func (k *Kernel) HandleComplete(req *scaffold.CompleteRequest) *scaffold.CompleteReply {
+	api, err := k.getAPI()
+	if err != nil {
+		return &scaffold.CompleteReply{
+			Status: "error",
+		}
+	}
+
+	sets, err := api.Series(context.Background(), []string{fmt.Sprintf(`{__name__=~"%s.*"}`, req.Code)}, k.Options.TimeStart, k.Options.TimeEnd)
+	if err != nil {
+		log.Printf("Error getting series: %s", err)
+		return &scaffold.CompleteReply{
+			Status: "error",
+		}
+	}
+
+	metrics := map[string]bool{}
+	for _, set := range sets {
+		name, ok := set[model.MetricNameLabel]
+		if ok {
+			metrics[string(name)] = true
+		}
+	}
+
+	matches := []string{}
+	for k := range metrics {
+		matches = append(matches, k)
+	}
+	sort.Strings(matches)
+
 	return &scaffold.CompleteReply{
 		Status:      "ok",
-		Matches:     []string{},
-		CursorStart: req.CursorPos,
+		Matches:     matches,
+		CursorStart: 0,
 		CursorEnd:   req.CursorPos,
 	}
 }
