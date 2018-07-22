@@ -63,7 +63,7 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 		}
 	}
 
-	result, err := k.handleInstantQuery(req.Code)
+	result, err := k.handleInstantQuery(req.Code, k.Options.TimeEnd)
 	if err != nil {
 		stream("stderr", fmt.Sprintf("Error executing query: %s", err))
 		return &scaffold.ExecuteResult{

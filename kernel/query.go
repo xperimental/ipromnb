@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/prometheus/common/model"
 )
@@ -25,8 +26,10 @@ type metricValue struct {
 	Value  model.SamplePair `json:"value"`
 }
 
-func (k *Kernel) handleInstantQuery(query string) (string, error) {
-	url := fmt.Sprintf("%s/api/v1/query?query=%s", k.Options.Server, url.QueryEscape(query))
+func (k *Kernel) handleInstantQuery(query string, instant time.Time) (string, error) {
+	q := url.QueryEscape(query)
+	time := url.QueryEscape(instant.UTC().Format(time.RFC3339))
+	url := fmt.Sprintf("%s/api/v1/query?query=%s&time=%s", k.Options.Server, q, time)
 	res, err := k.client.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("http error: %s", err)
