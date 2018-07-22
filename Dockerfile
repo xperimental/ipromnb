@@ -1,6 +1,6 @@
 FROM golang:1 AS builder
 
-ENV REPO=github.com/xperimental/ipromnb/cmd/prometheus-kernel
+ENV REPO=github.com/xperimental/ipromnb
 ENV PACKAGE=${REPO}/cmd/prometheus-kernel
 
 RUN mkdir -p /go/src/${REPO}
