@@ -28,6 +28,7 @@ func New(server string) *Kernel {
 			Server:    server,
 			TimeStart: time.Now().Add(-24 * time.Hour),
 			TimeEnd:   time.Now(),
+			NowFunc:   time.Now,
 		},
 		client: &http.Client{
 			Timeout: 30 * time.Second,

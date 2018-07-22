@@ -2,6 +2,7 @@ package kernel
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -12,6 +13,7 @@ type Options struct {
 	Server    string
 	TimeStart time.Time
 	TimeEnd   time.Time
+	NowFunc   func() time.Time
 }
 
 func (o Options) Pretty() string {
@@ -34,11 +36,11 @@ func (k *Kernel) handleOptions(input string) error {
 		case "server":
 			k.Options.Server = value
 		case "timestart", "start":
-			if err := setTime(&k.Options.TimeStart, value); err != nil {
+			if err := setTime(&k.Options.TimeStart, value, k.Options); err != nil {
 				return err
 			}
 		case "timeend", "end":
-			if err := setTime(&k.Options.TimeEnd, value); err != nil {
+			if err := setTime(&k.Options.TimeEnd, value, k.Options); err != nil {
 				return err
 			}
 		default:
@@ -48,9 +50,33 @@ func (k *Kernel) handleOptions(input string) error {
 	return nil
 }
 
-func setTime(v *time.Time, value string) error {
-	if strings.ToLower(value) == "now" {
-		*v = time.Now()
+var relativeRegex = regexp.MustCompile(`^(now|start|end)\W*(([+-])\W*(.+))?$`)
+
+func setTime(v *time.Time, value string, options Options) error {
+	if match := relativeRegex.FindStringSubmatch(value); match != nil {
+		base := strings.ToLower(match[1])
+		op := match[3]
+		value := match[4]
+
+		baseValue := options.NowFunc()
+		switch base {
+		case "start":
+			baseValue = options.TimeStart
+		case "end":
+			baseValue = options.TimeEnd
+		}
+
+		if value == "" {
+			*v = baseValue
+			return nil
+		}
+
+		duration, err := time.ParseDuration(op + value)
+		if err != nil {
+			return fmt.Errorf("can not parse duration: %s", err)
+		}
+
+		*v = baseValue.Add(duration)
 		return nil
 	}
 
