@@ -1,10 +1,8 @@
 package kernel
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"image/png"
 	"net/http"
 	"strings"
 	"time"
@@ -76,17 +74,9 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 			}
 		}
 
-		buf := &bytes.Buffer{}
-		if err := png.Encode(buf, result); err != nil {
-			stream("stderr", fmt.Sprintf("Error encoding image: %s", err))
-			return &scaffold.ExecuteResult{
-				Status: "error",
-			}
-		}
-
 		displayData(&scaffold.DisplayData{
 			Data: map[string]interface{}{
-				"image/png": buf.Bytes(),
+				"image/png": result,
 			},
 		}, false)
 
