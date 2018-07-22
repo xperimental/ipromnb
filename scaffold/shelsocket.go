@@ -318,7 +318,7 @@ func (s *shellSocket) handleMessages() error {
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshal messages from %s: %v", s.name, err)
 	}
-	log.Warningf("MsgType in %s: %q", s.name, msg.Header.MsgType)
+	log.Debugf("MsgType in %s: %q", s.name, msg.Header.MsgType)
 	switch typ := msg.Header.MsgType; typ {
 	case "kernel_info_request":
 		if err := s.sendKernelInfo(&msg); err != nil {
