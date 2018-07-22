@@ -3,10 +3,7 @@ package kernel
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/url"
 	"regexp"
 	"strconv"
 	"time"
@@ -35,29 +32,37 @@ type metricValue struct {
 	Value  model.SamplePair `json:"value"`
 }
 
-func (k *Kernel) handleInstantQuery(query string, instant time.Time) (string, error) {
-	q := url.QueryEscape(query)
-	time := url.QueryEscape(instant.UTC().Format(time.RFC3339))
-	url := fmt.Sprintf("%s/api/v1/query?query=%s&time=%s", k.Options.Server, q, time)
-	res, err := k.client.Get(url)
+func (k *Kernel) getAPI() (prometheus.QueryAPI, error) {
+	client, err := prometheus.New(prometheus.Config{
+		Address: k.Options.Server,
+	})
 	if err != nil {
-		return "", fmt.Errorf("http error: %s", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("non-OK status code: %d", res.StatusCode)
+		return nil, fmt.Errorf("failed to create client: %s", err)
 	}
 
-	var result queryResult
-	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
-		return "", fmt.Errorf("error parsing result: %s", err)
+	return prometheus.NewQueryAPI(client), nil
+}
+
+func (k *Kernel) handleInstantQuery(query string, instant time.Time) (string, error) {
+	api, err := k.getAPI()
+	if err != nil {
+		return "", err
+	}
+
+	value, err := api.Query(context.Background(), query, instant)
+	if err != nil {
+		return "", fmt.Errorf("query failed: %s", err)
+	}
+
+	result, ok := value.(model.Vector)
+	if !ok {
+		return "", fmt.Errorf("can not convert to vector: %t", value)
 	}
 
 	output := &bytes.Buffer{}
 	fmt.Fprintln(output, "<table><thead><tr><th>Metric</th><th>Value</th></thead><tbody>")
-	for _, m := range result.Data.Result {
-		fmt.Fprintln(output, fmt.Sprintf("<tr><td>%s</td><td>%f</td>", model.Metric(m.Labels), m.Value.Value))
+	for _, m := range result {
+		fmt.Fprintln(output, fmt.Sprintf("<tr><td>%s</td><td>%f</td>", m.Metric, m.Value))
 	}
 	fmt.Fprintf(output, "</tbody></table>")
 
@@ -73,13 +78,6 @@ const (
 var labelText = regexp.MustCompile("\\{(.*)\\}")
 
 func (k *Kernel) handleRangeQuery(query string, start, end time.Time) ([]byte, error) {
-	client, err := prometheus.New(prometheus.Config{
-		Address: k.Options.Server,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create client: %s", err)
-	}
-
 	duration := k.Options.TimeEnd.Sub(k.Options.TimeStart)
 	rng := prometheus.Range{
 		Start: k.Options.TimeStart,
@@ -87,7 +85,11 @@ func (k *Kernel) handleRangeQuery(query string, start, end time.Time) ([]byte, e
 		Step:  duration / 320,
 	}
 
-	api := prometheus.NewQueryAPI(client)
+	api, err := k.getAPI()
+	if err != nil {
+		return nil, err
+	}
+
 	value, err := api.QueryRange(context.Background(), query, rng)
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %s", err)
