@@ -3,6 +3,7 @@ package kernel
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -33,6 +34,10 @@ type metricValue struct {
 	Labels model.Metric     `json:"metric"`
 	Value  model.SamplePair `json:"value"`
 }
+
+var (
+	errNoMetrics = errors.New("no matching metrics")
+)
 
 func (k *Kernel) handleQuery(ctx context.Context, count int, code string,
 	stream func(name, text string), displayData scaffold.DisplayFunc) (string, error) {
@@ -96,6 +101,10 @@ func (k *Kernel) handleInstantQuery(ctx context.Context, query string, instant t
 		return "", fmt.Errorf("can not convert to vector: %t", value)
 	}
 
+	if len(result) == 0 {
+		return "", errNoMetrics
+	}
+
 	output := &bytes.Buffer{}
 	fmt.Fprintln(output, "<table><thead><tr><th>Metric</th><th>Value</th></thead><tbody>")
 	for _, m := range result {
@@ -135,6 +144,10 @@ func (k *Kernel) handleRangeQuery(ctx context.Context, query string, start, end 
 	metrics, ok := value.(model.Matrix)
 	if !ok {
 		return nil, fmt.Errorf("failed to convert to matrix: %t", value)
+	}
+
+	if len(metrics) == 0 {
+		return nil, errNoMetrics
 	}
 
 	return plotResult(metrics, zero)
