@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -42,6 +43,8 @@ func (k *Kernel) HandleKernelInfo() scaffold.KernelInfo {
 	}
 }
 
+var graphRegex = regexp.MustCompile(`^graph(0?)\((.+)\)$`)
+
 func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.ExecuteRequest,
 	stream func(name, text string),
 	displayData func(data *scaffold.DisplayData, update bool)) *scaffold.ExecuteResult {
@@ -63,10 +66,11 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 		}
 	}
 
-	if strings.HasPrefix(strings.ToLower(req.Code), "graph(") && strings.HasSuffix(req.Code, ")") {
-		query := req.Code[6 : len(req.Code)-1]
+	if match := graphRegex.FindStringSubmatch(req.Code); match != nil {
+		zero := match[1] == "0"
+		query := match[2]
 
-		result, err := k.handleRangeQuery(query, k.Options.TimeStart, k.Options.TimeEnd)
+		result, err := k.handleRangeQuery(query, k.Options.TimeStart, k.Options.TimeEnd, zero)
 		if err != nil {
 			stream("stderr", fmt.Sprintf("Error executing query: %s", err))
 			return &scaffold.ExecuteResult{

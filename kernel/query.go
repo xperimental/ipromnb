@@ -77,7 +77,7 @@ const (
 // Only show important part of metric name
 var labelText = regexp.MustCompile("\\{(.*)\\}")
 
-func (k *Kernel) handleRangeQuery(query string, start, end time.Time) ([]byte, error) {
+func (k *Kernel) handleRangeQuery(query string, start, end time.Time, zero bool) ([]byte, error) {
 	duration := k.Options.TimeEnd.Sub(k.Options.TimeStart)
 	rng := prometheus.Range{
 		Start: k.Options.TimeStart,
@@ -100,10 +100,10 @@ func (k *Kernel) handleRangeQuery(query string, start, end time.Time) ([]byte, e
 		return nil, fmt.Errorf("failed to convert to matrix: %t", value)
 	}
 
-	return plotResult(metrics)
+	return plotResult(metrics, zero)
 }
 
-func plotResult(metrics model.Matrix) ([]byte, error) {
+func plotResult(metrics model.Matrix, zero bool) ([]byte, error) {
 	p, err := plot.New()
 	if err != nil {
 		return nil, fmt.Errorf("error creating plotter: %s", err)
@@ -119,6 +119,10 @@ func plotResult(metrics model.Matrix) ([]byte, error) {
 	p.Y.Tick.Label.Font = textFont
 	p.Legend.Font = textFont
 	p.Legend.YOffs = 10 * vg.Millimeter
+
+	if zero {
+		p.Y.Min = 0
+	}
 
 	// Color palette for drawing lines
 	paletteSize := 8
