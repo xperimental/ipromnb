@@ -1,8 +1,10 @@
 package kernel
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"image/png"
 	"net/http"
 	"strings"
 	"time"
@@ -57,6 +59,37 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 		}
 
 		stream("stdout", k.Options.Pretty())
+		return &scaffold.ExecuteResult{
+			Status:         "ok",
+			ExecutionCount: k.execution,
+		}
+	}
+
+	if strings.HasPrefix(strings.ToLower(req.Code), "graph(") && strings.HasSuffix(req.Code, ")") {
+		query := req.Code[6 : len(req.Code)-1]
+
+		result, err := k.handleRangeQuery(query, k.Options.TimeStart, k.Options.TimeEnd)
+		if err != nil {
+			stream("stderr", fmt.Sprintf("Error executing query: %s", err))
+			return &scaffold.ExecuteResult{
+				Status: "error",
+			}
+		}
+
+		buf := &bytes.Buffer{}
+		if err := png.Encode(buf, result); err != nil {
+			stream("stderr", fmt.Sprintf("Error encoding image: %s", err))
+			return &scaffold.ExecuteResult{
+				Status: "error",
+			}
+		}
+
+		displayData(&scaffold.DisplayData{
+			Data: map[string]interface{}{
+				"image/png": buf.Bytes(),
+			},
+		}, false)
+
 		return &scaffold.ExecuteResult{
 			Status:         "ok",
 			ExecutionCount: k.execution,

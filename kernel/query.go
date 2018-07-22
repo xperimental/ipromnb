@@ -3,7 +3,9 @@ package kernel
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"image"
 	"net/http"
 	"net/url"
 	"time"
@@ -53,4 +55,8 @@ func (k *Kernel) handleInstantQuery(query string, instant time.Time) (string, er
 	fmt.Fprintf(output, "</tbody></table>")
 
 	return output.String(), nil
+}
+
+func (k *Kernel) handleRangeQuery(query string, start, end time.Time) (*image.RGBA, error) {
+	return nil, errors.New("not implemented")
 }
