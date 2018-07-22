@@ -31,6 +31,12 @@ type KernelInfo struct {
 	ImplementationVersion string             `json:"implementation_version"`
 	LanguageInfo          KernelLanguageInfo `json:"language_info"`
 	Banner                string             `json:"banner"`
+	HelpLinks             []HelpLink         `json:"help_links"`
+}
+
+type HelpLink struct {
+	Text string `json:"text"`
+	URL  string `json:"url"`
 }
 
 // KernelLanguageInfo represents language_info in kernel_info_reply.

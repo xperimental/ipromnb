@@ -37,12 +37,26 @@ func New(server string) *Kernel {
 func (k *Kernel) HandleKernelInfo() scaffold.KernelInfo {
 	return scaffold.KernelInfo{
 		ProtocolVersion:       "5.2",
-		Implementation:        "PrometheusKernel",
+		Implementation:        "ipromnb",
 		ImplementationVersion: "0.0.1",
 		LanguageInfo: scaffold.KernelLanguageInfo{
 			Name: "prometheus",
 		},
 		Banner: "prometheus banner",
+		HelpLinks: []scaffold.HelpLink{
+			{
+				Text: "PromQL Basics",
+				URL:  "https://prometheus.io/docs/prometheus/latest/querying/basics/",
+			},
+			{
+				Text: "PromQL Operators",
+				URL:  "https://prometheus.io/docs/prometheus/latest/querying/operators/",
+			},
+			{
+				Text: "PromQL Functions",
+				URL:  "https://prometheus.io/docs/prometheus/latest/querying/functions/",
+			},
+		},
 	}
 }
 
