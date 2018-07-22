@@ -1,21 +1,17 @@
 package kernel
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
-	"github.com/prometheus/common/model"
 	"github.com/xperimental/ipromnb/scaffold"
 )
 
 type Kernel struct {
-	serverURL string
+	Options   Options
 	client    *http.Client
 	execution int
 }
@@ -23,7 +19,11 @@ type Kernel struct {
 // New creates a new Prometheus kernel.
 func New(server string) *Kernel {
 	return &Kernel{
-		serverURL: server,
+		Options: Options{
+			Server:    server,
+			TimeStart: time.Now().Add(-24 * time.Hour),
+			TimeEnd:   time.Now(),
+		},
 		client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -48,16 +48,22 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 
 	k.execution++
 
-	if strings.HasPrefix(req.Code, "server=") {
-		k.serverURL = strings.TrimPrefix(req.Code, "server=")
-		stream("stdout", fmt.Sprintf("Server set to %q.", k.serverURL))
+	if strings.HasPrefix(req.Code, "@") {
+		if err := k.handleOptions(req.Code); err != nil {
+			stream("stderr", fmt.Sprintf("Error setting options: %s", err))
+			return &scaffold.ExecuteResult{
+				Status: "error",
+			}
+		}
+
+		stream("stdout", k.Options.Pretty())
 		return &scaffold.ExecuteResult{
 			Status:         "ok",
 			ExecutionCount: k.execution,
 		}
 	}
 
-	result, err := k.handleQuery(req.Code)
+	result, err := k.handleInstantQuery(req.Code)
 	if err != nil {
 		stream("stderr", fmt.Sprintf("Error executing query: %s", err))
 		return &scaffold.ExecuteResult{
@@ -75,48 +81,6 @@ func (k *Kernel) HandleExecuteRequest(ctx context.Context, req *scaffold.Execute
 		Status:         "ok",
 		ExecutionCount: k.execution,
 	}
-}
-
-type queryResult struct {
-	Status string    `json:"status"`
-	Data   queryData `json:"data"`
-}
-
-type queryData struct {
-	Type   string        `json:"resultType"`
-	Result []metricValue `json:"result"`
-}
-
-type metricValue struct {
-	Labels model.Metric     `json:"metric"`
-	Value  model.SamplePair `json:"value"`
-}
-
-func (k *Kernel) handleQuery(query string) (string, error) {
-	url := fmt.Sprintf("%s/api/v1/query?query=%s", k.serverURL, url.QueryEscape(query))
-	res, err := k.client.Get(url)
-	if err != nil {
-		return "", fmt.Errorf("http error: %s", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("non-OK status code: %d", res.StatusCode)
-	}
-
-	var result queryResult
-	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
-		return "", fmt.Errorf("error parsing result: %s", err)
-	}
-
-	output := &bytes.Buffer{}
-	fmt.Fprintln(output, "<table><thead><tr><th>Metric</th><th>Value</th></thead><tbody>")
-	for _, m := range result.Data.Result {
-		fmt.Fprintln(output, fmt.Sprintf("<tr><td>%s</td><td>%f</td>", model.Metric(m.Labels), m.Value.Value))
-	}
-	fmt.Fprintf(output, "</tbody></table>")
-
-	return output.String(), nil
 }
 
 func (k *Kernel) HandleComplete(req *scaffold.CompleteRequest) *scaffold.CompleteReply {
