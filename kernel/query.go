@@ -60,6 +60,10 @@ func (k *Kernel) handleQuery(ctx context.Context, count int, code string,
 }
 
 func (k *Kernel) getAPI() (promv1.API, error) {
+	if k.Options.Server == "" {
+		return nil, fmt.Errorf("no server set. set one using @server=<url>")
+	}
+
 	client, err := api.NewClient(api.Config{
 		Address: k.Options.Server,
 	})

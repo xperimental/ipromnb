@@ -19,7 +19,8 @@ type Options struct {
 func (o Options) Pretty() string {
 	start := o.TimeStart.UTC().Format(time.RFC3339)
 	end := o.TimeEnd.UTC().Format(time.RFC3339)
-	return fmt.Sprintf("Server: %s\n  Time: %s - %s", o.Server, start, end)
+	duration := o.TimeEnd.Sub(o.TimeStart)
+	return fmt.Sprintf("Server: %s\n  Time: %s - %s (%s)", o.Server, start, end, duration)
 }
 
 func (k *Kernel) handleOptions(input string) error {
