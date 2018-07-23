@@ -6,11 +6,9 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"sort"
 	"strings"
 	"time"
 
-	"github.com/prometheus/common/model"
 	"github.com/xperimental/ipromnb/scaffold"
 )
 
@@ -114,36 +112,13 @@ func lastIdentifier(input string, pos int) (string, int, int) {
 }
 
 func (k *Kernel) HandleComplete(req *scaffold.CompleteRequest) *scaffold.CompleteReply {
-	identifier, start, end := lastIdentifier(req.Code, req.CursorPos)
-
-	api, err := k.getAPI()
+	matches, start, end, err := k.handleComplete(req.Code, req.CursorPos)
 	if err != nil {
+		log.Printf("Error executing completion: %s", err)
 		return &scaffold.CompleteReply{
 			Status: "error",
 		}
 	}
-
-	sets, err := api.Series(context.Background(), []string{fmt.Sprintf(`{__name__=~"%s.*"}`, identifier)}, k.Options.TimeStart, k.Options.TimeEnd)
-	if err != nil {
-		log.Printf("Error getting series: %s", err)
-		return &scaffold.CompleteReply{
-			Status: "error",
-		}
-	}
-
-	metrics := map[string]bool{}
-	for _, set := range sets {
-		name, ok := set[model.MetricNameLabel]
-		if ok {
-			metrics[string(name)] = true
-		}
-	}
-
-	matches := []string{}
-	for k := range metrics {
-		matches = append(matches, k)
-	}
-	sort.Strings(matches)
 
 	return &scaffold.CompleteReply{
 		Status:      "ok",
