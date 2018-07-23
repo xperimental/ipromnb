@@ -28,4 +28,6 @@ RUN apt-get update \
 COPY --from=builder /go/bin/prometheus-kernel /usr/local/bin/
 COPY kernel.json logo-32x32.png logo-64x64.png /opt/conda/share/jupyter/kernels/prometheus/
 
+VOLUME /home/jovyan/work/
+
 USER $NB_UID
