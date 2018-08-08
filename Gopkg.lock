@@ -3,80 +3,101 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:c11ecaff753d95de1e3c9c88f7db41ada8e4f8a38f278d4ec04c87d48b6b5ed3"
   name = "github.com/ajstarks/svgo"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "644b8db467afccf19a0692a3e31a1868e4287ab8"
 
 [[projects]]
   branch = "master"
+  digest = "1:691d02b5893eaec4e1e6261ebf2cc81a2a69889241a34b39279175d8b5c54020"
   name = "github.com/golang/freetype"
   packages = [
     ".",
     "raster",
-    "truetype"
+    "truetype",
   ]
+  pruneopts = "NUT"
   revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
 
 [[projects]]
   branch = "errors"
+  digest = "1:4844465e4168dd25835ef6c8f243133dd36e6694e133f17cba9a2acbbdbe361e"
   name = "github.com/gonum/plot"
   packages = [
     "palette",
-    "palette/brewer"
+    "palette/brewer",
   ]
+  pruneopts = "NUT"
   revision = "e844702637a6a728ff6da6041abd81794d69b917"
 
 [[projects]]
+  digest = "1:ea57e0662629814b58a8ae0fbb7f3b5a39f57ccf3b33c69a680807fb2de990e6"
   name = "github.com/jung-kurt/gofpdf"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "14c1db30737a138f8d9797cffea58783892b2fae"
   version = "v1.0.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:30520cf7eaa8b3a65ce08ba3ad600b9e1fb97de1102b355f3c0b2b4fffd31a12"
   name = "github.com/llgcode/draw2d"
   packages = [
     ".",
     "draw2dbase",
-    "draw2dimg"
+    "draw2dimg",
   ]
+  pruneopts = "NUT"
   revision = "274031cf2abe8acd15c4a911e1f7f1295fc4830c"
 
 [[projects]]
   branch = "master"
+  digest = "1:ad0efc66b99f7b5aa074532621b4ddf7e4be28c07977415df3bb2fc4de181b91"
   name = "github.com/pebbe/zmq4"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "5b443b6471cea4b4f9f85025530c04c93233f76a"
 
 [[projects]]
   branch = "master"
+  digest = "1:847de07f01d12a68049c2ad8a1d494e75caa0d4a567e8744b9db50fe65dd1197"
   name = "github.com/prometheus/client_golang"
   packages = [
     "api",
-    "api/prometheus/v1"
+    "api/prometheus/v1",
   ]
+  pruneopts = "NUT"
   revision = "bcbbc08eb2ddff3af83bbf11e7ec13b4fd730b6e"
 
 [[projects]]
   branch = "master"
+  digest = "1:644d7e65ea431241ea1b95ae423634da11e6a2776a36f0049b49eac9defb877b"
   name = "github.com/prometheus/common"
   packages = ["model"]
+  pruneopts = "NUT"
   revision = "7600349dcfe1abd18d72d3a1770870d9800a7801"
 
 [[projects]]
+  digest = "1:b2339e83ce9b5c4f79405f949429a7f68a9a904fed903c672aac1e7ceb7f5f02"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
   version = "v1.0.6"
 
 [[projects]]
   branch = "master"
+  digest = "1:3f3a05ae0b95893d90b9b3b5afdb79a9b3d96e4e36e099d841ae602e4aca0da8"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
+  pruneopts = "NUT"
   revision = "a2144134853fc9a27a7b1e3eb4f19f1a76df13c9"
 
 [[projects]]
   branch = "master"
+  digest = "1:6d809b59461cb45fc16f6aad67a3d81066e5f9098abf8b13eb4c49a03a6e2ef9"
   name = "golang.org/x/image"
   packages = [
     "draw",
@@ -84,21 +105,25 @@
     "math/f64",
     "math/fixed",
     "tiff",
-    "tiff/lzw"
+    "tiff/lzw",
   ]
+  pruneopts = "NUT"
   revision = "c73c2afc3b812cdd6385de5a50616511c4a3d458"
 
 [[projects]]
   branch = "master"
+  digest = "1:5420733d35e5e562fffc7c5b99660f3587af042b5420f19b17fe0426e6a5259d"
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows"
+    "windows",
   ]
+  pruneopts = "NUT"
   revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
 [[projects]]
   branch = "master"
+  digest = "1:6131e1e467370f5734e9045ed79cbee0430833f697fd7dde09f88fe9e8a7be3c"
   name = "gonum.org/v1/gonum"
   packages = [
     "blas",
@@ -112,12 +137,14 @@
     "lapack",
     "lapack/gonum",
     "lapack/lapack64",
-    "mat"
+    "mat",
   ]
+  pruneopts = "NUT"
   revision = "72e79ca98526cae0807f57ef69033b767f715ea7"
 
 [[projects]]
   branch = "master"
+  digest = "1:6723c1a265b397513d05eff53a39f9d626a440d95247593d10542a1044da556d"
   name = "gonum.org/v1/plot"
   packages = [
     ".",
@@ -130,13 +157,25 @@
     "vg/vgeps",
     "vg/vgimg",
     "vg/vgpdf",
-    "vg/vgsvg"
+    "vg/vgsvg",
   ]
+  pruneopts = "NUT"
   revision = "39ccdfa2a491a630db72d7bbe2c760f4f3d06ab6"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5680e011cf609335a5372dc561ecfc0f3e52a99c3804ea39d5eb60878c9a2a98"
+  input-imports = [
+    "github.com/gonum/plot/palette/brewer",
+    "github.com/pebbe/zmq4",
+    "github.com/prometheus/client_golang/api",
+    "github.com/prometheus/client_golang/api/prometheus/v1",
+    "github.com/prometheus/common/model",
+    "github.com/sirupsen/logrus",
+    "gonum.org/v1/plot",
+    "gonum.org/v1/plot/plotter",
+    "gonum.org/v1/plot/vg",
+    "gonum.org/v1/plot/vg/draw",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
