@@ -24,7 +24,7 @@ Check the `_examples` directory for a simple [example notebook](_examples/Test.i
 
 ### Creating your first notebook
 
-This example assumes, that a Prometheus server is available using the URL `http://prometheus:9090/`.
+This example assumes that a Prometheus server is available using the URL `http://prometheus:9090/`.
 
 Jupyter notebooks contain blocks (so called "cells") that can either be `Code` or `Markdown`. The Markdown is rendered as HTML and can be used for descriptions. The Code cells are rendered by the so-called "kernel" used for the notebook. This project provides a kernel that will interpret the code cells as queries which are to be sent to a Prometheus server.
 
@@ -68,3 +68,53 @@ There are also commands to change the timeframe used for the queries. Modify the
 This sets the timeframe to "from 12 hours ago until now". The times can either be given relative to `now`, `start` or `end` or in RFC3339 format (for example `2018-08-08T12:00:00Z`).
 
 Now let's restart the notebook and watch what happens. To do this select the "Restart & Run All" item from the "Kernel" menu at the top. This restarts the kernel and re-runs all the code blocks. You should now have output that reflects the changed timeframe in all outputs.
+
+### Commands interpreted by kernel
+
+The kernel tries to interpret every code cell as a query to the Prometheus server except if it is a command that is directly executed by the kernel itself.
+
+#### Setting options
+
+All the internal commands modify internal state of the kernel, which means that they have an effect for all subsequent cell executions until the kernel is either restarted or another command is issued.
+
+Currently the following commands are understood by the kernel:
+
+- `@server=` sets the Prometheus server used for queries.
+- `@start=` sets the start time of the timerange used by range queries.
+- `@end=` sets the end time of the timerange used by range queries. This time is also used for instant queries.
+
+The `@start=` and `@end=` commands accept either a RFC3339 formatted timestamp (for example `2018-08-08T12:00:00Z`) or a time relative to either `now`, `start` or `end`:
+
+|                                                          |                    |
+| -------------------------------------------------------: | ------------------ |
+|                                Set the end time to "now" | `@end=now`         |
+|              Set the start time to "12 hours before end" | `@start=end-12h`   |
+|                     Set the start time to "24 hours ago" | `@start=now-24h`   |
+| Set the end time to "6 hours and 30 minutes after start" | `@end=start+6h30m` |
+
+More than one command can be provided in a single code cell (one per line).
+
+#### Plotting graphs
+
+In addition to commands which are used for changing the kernel options there is another command which controls whether a query will be executed as an "instant" or "range" query yielding either a table of values at the `end` time or a plot of the values between the `start` and `end` time:
+
+```plain
+graph(<query>)
+```
+
+It has a single optional parameter which can be used to set the minimum of the Y axis of the plot to zero:
+
+```plain
+graph0(<query>)
+```
+
+## Features (including planned)
+
+This project is still in a very early stage of development which means that only a subset of the planned features are implemented already and also that some existing features might change in the future. Feedback and suggestions are appreciated.
+
+- [x] Send range and instant queries to Prometheus server
+- [x] Graph range queries
+- [x] Provide a way to set timerange to fixed and dynamic values
+- [ ] Make graphs more interactive (currently pre-rendered images)
+- [ ] Possibility to test recording rules which are not on the server yet
+- [ ] Make it possible to test alerting rules against past data
