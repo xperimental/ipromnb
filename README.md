@@ -122,6 +122,8 @@ This project is still in a very early stage of development which means that only
 - [x] Send range and instant queries to Prometheus server
 - [x] Graph range queries
 - [x] Provide a way to set timerange to fixed and dynamic values
+- [x] Simple tab-completion of series names
 - [ ] Make graphs more interactive (currently pre-rendered images)
+- [ ] Code highlighting and more advanced tab-completion
 - [ ] Possibility to test recording rules which are not on the server yet
 - [ ] Make it possible to test alerting rules against past data
