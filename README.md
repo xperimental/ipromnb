@@ -4,6 +4,13 @@
 
 Kernel for [Jupyter Notebooks](http://jupyter.org/) which can query [Prometheus](https://prometheus.io/) servers.
 
+Because notebooks can also contain documentation this makes it ideal for things like
+
+- prototyping new queries for future dashboards
+- documenting an outage using metrics
+
+The generated files also contain the results of the queries and so are self-contained and can be read without actively querying the Prometheus server that was used to generate them. This is ideal for sharing thoughts or for archival purposes. GitHub also contains a preview renderer, have a look at [the example file](_examples/Test.ipynb).
+
 ## Usage
 
 ### Starting an instance
